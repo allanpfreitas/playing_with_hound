@@ -1,0 +1,23 @@
+version: v1.0
+name: Test MyApp
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: Test
+    task:
+      env_vars:
+        - name: DATABASE_URL
+          value: 'ecto://postgres:@0.0.0.0:5432/myapp_test'
+        - name: MIX_ENV
+          value: test
+      jobs:
+        - name: mix test
+          commands:
+            - change-phantomjs-version 2.1.1
+            - nvm use 6.9.4
+            - npm install
+            - node_modules/.bin/brunch build
+            - 'MIX_ENV=test mix do deps.compile, compile'
+            - phantomjs --wd --webdriver-loglevel=ERROR &
